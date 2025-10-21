@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,8 +60,20 @@ public class EmployeeServiceTest {
 
     @Test
     public void testDeleteEmployee() {
+        when(employeeRepository.existsById(1L)).thenReturn(true);
         employeeService.deleteEmployee(1L);
         verify(employeeRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testDeleteEmployee_whenEmployeeNotFound_shouldThrowException() {
+        when(employeeRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(RuntimeException.class, () -> {
+            employeeService.deleteEmployee(1L);
+        });
+
+        verify(employeeRepository, never()).deleteById(1L);
     }
 
     @Test
